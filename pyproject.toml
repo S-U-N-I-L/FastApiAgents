@@ -16,6 +16,9 @@ dependencies = [
     "langchain-google-genai>=4.2.0", # Gemini integration
     "langchain>=0.3.0",           # Main LangChain library
     "tavily-python>=0.5.0",
+    "langchain-community>=0.3.0",
     "langchain-openai>=0.3.0",
-    "langgraph-checkpoint-sqlite>=2.0.0"
+    "langgraph-checkpoint-sqlite>=2.0.0",
+    "langchain-tavily>=0.2.17",
+    "wikipedia>=1.4.0",
 ]

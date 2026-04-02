@@ -12,10 +12,7 @@ from langgraph.graph import StateGraph, MessagesState
 from langgraph.types import Send
 from pydantic import BaseModel, Field
 
-import warnings
 
-# Suppress the specific LangGraph serialization warning
-warnings.filterwarnings("ignore", message="Deserializing unregistered type")
 
 
 # 1. Determine the environment (default to 'local')

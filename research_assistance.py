@@ -2,7 +2,7 @@ import operator
 import os
 from typing import TypedDict, Annotated, List
 
-from docutils.nodes import topic
+from docutils.nodes import topic, system_message
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage, get_buffer_string
 from langchain_openai import ChatOpenAI
@@ -209,7 +209,7 @@ Your goal is boil down to interesting and specific insights related to your topi
 
 Here is your topic of focus and set of goals: {goals}
 
-Begin by introducing yourself using a name that fits your persona, and then ask your question.
+Begin by introducing yourself using your name that is there in your persona, and then ask your question.
 
 Continue to ask questions to drill down and refine your understanding of the topic.
 
@@ -227,7 +227,21 @@ def generate_question(state: InterviewState):
 
     # Generate question
     system_message = question_instructions.format(goals=analyst.persona)
+
+    system_message = system_message + f"""{question_instructions.format(goals=analyst.description)}
+
+        YOUR IDENTITY:
+        You are {analyst.name}, a {analyst.role} at {analyst.affiliation}.
+
+        REMEMBER: 
+        1. You are the interviewer. 
+        2. Do NOT address the expert as {analyst.name}. 
+        3. Introduce yourself as {analyst.name}."""
+
     question = llm.invoke([SystemMessage(content=system_message)] + messages)
+
+    print(f'messages : {messages}')
+    print(f'question generate : {question}')
 
     # Write messages to state
     return {"messages": [question]}
@@ -250,12 +264,18 @@ tavily = os.getenv("TAVILY_API_KEY")
 from langchain_tavily import TavilySearch  # updated 1.0
 
 tavily_search = TavilySearch(max_results=3)
+
 def search_web(state: InterviewState):
     """ Retrieve docs from web search """
-
+    print('msg in tavily start', "--"*50)
+    for msg in state["messages"]:
+        msg.pretty_print()
+    print('msg in tavily end', "--" * 50)
     # Search query
     structured_llm = llm.with_structured_output(SearchQuery)
     search_query = structured_llm.invoke([search_instructions] + state['messages'])
+
+    print(f'search query : {search_query}')
 
     # Search
     # search_docs = tavily_search.invoke(search_query.search_query) # updated 1.0
@@ -275,11 +295,12 @@ def search_web(state: InterviewState):
 from langchain_community.document_loaders import WikipediaLoader
 def search_wikipedia(state: InterviewState):
     """ Retrieve docs from wikipedia """
-
+    print('searching using wiki')
     # Search query
     structured_llm = llm.with_structured_output(SearchQuery)
     search_query = structured_llm.invoke([search_instructions] + state['messages'])
 
+    print(f'search query : {search_query}')
     # Search
     search_docs = WikipediaLoader(query=search_query.search_query,
                                   load_max_docs=2).load()
@@ -326,7 +347,7 @@ And skip the addition of the brackets as well as the Document source preamble in
 
 def generate_answer(state: InterviewState):
     """ Node to answer a question """
-
+    print('ansering now ')
     # Get state
     analyst = state["analyst"]
     messages = state["messages"]

@@ -11,15 +11,19 @@ dependencies = [
     "pydantic>=2.12.5",
     "pydantic[email]>=2.0.0",
     "pydantic-settings>=2.11.0",
-    "pydantic-ai[google]>=1.68.0",
+    "pydantic-ai-slim[google]>=1.68.0",
     "langgraph>=1.1.2",           # Core graph orchestration
     "langchain-google-genai>=4.2.0", # Gemini integration
     "langchain>=0.3.0",           # Main LangChain library
     "tavily-python>=0.5.0",
     "langchain-community>=0.3.0",
     "langchain-openai>=0.3.0",
+    "trustcall>=0.0.39",
     "langgraph-checkpoint-sqlite>=2.0.0",
     "langchain-tavily>=0.2.17",
     "wikipedia>=1.4.0",
     "ipython>=9.12.0",
+    "chromadb>=0.5.0",
+    "onnxruntime==1.19.2",
+    "langchain-chroma"
 ]

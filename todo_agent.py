@@ -117,7 +117,7 @@ class Profile(BaseModel):
 # ToDo schema
 class ToDo(BaseModel):
     task: str = Field(description="The task to be completed.")
-    time_to_complete: Optional[int] = Field(description="Estimated time to complete the task (minutes).")
+    time_to_complete: Optional[int] = Field(description="Estimated time to complete the task its in minutes but if 1 day then convert")
     deadline: Optional[datetime] = Field(
         description="When the task needs to be completed by (if applicable)",
         default=None
@@ -416,7 +416,15 @@ for chunk in graph.stream({"messages": input_messages}, config, stream_mode="val
 
 print('next call')
 # User input for a ToDo
-input_messages = [HumanMessage(content="My wife asked me to book swim lessons for the baby and need to find a math teacher for her by eod today")]
+input_messages = [HumanMessage(content="My wife asked me to book swim lessons for the baby and find some mexican restaurents in moline and add to my todo list")]
+
+# Run the graph
+for chunk in graph.stream({"messages": input_messages}, config, stream_mode="values"):
+    chunk["messages"][-1].pretty_print()
+
+print('next call')
+# User input for a ToDo
+input_messages = [HumanMessage(content="ok done with my dinner in Los Agaves update my task status")]
 
 # Run the graph
 for chunk in graph.stream({"messages": input_messages}, config, stream_mode="values"):
@@ -424,15 +432,25 @@ for chunk in graph.stream({"messages": input_messages}, config, stream_mode="val
 
 profile_memory = across_thread_memory.search(("profile", "Sunil"))
 todo_memory = across_thread_memory.search(("todo", "Sunil"))
-print(profile_memory[0].value)
+print(f" profile memory {profile_memory[0]}")
 for task in todo_memory:
     print(f'task key {task.key} - value {task.value}')
 
 
+instructions_memory = across_thread_memory.search(("instructions", "Sunil"))
+for instruction in instructions_memory:
+    print(f'instruction key {instruction.key} - value {instruction.value}')
 
 
-
-
+# print('ok printing all messages ')
+# # 1. Run the graph to completion
+# # invoke() waits for all nodes/loops to finish and returns the final state
+# final_state = graph.invoke({"messages": "hi my name is shanaya, i like doing crazy things"}, {"configurable":{"thread_id":"2", "user_id":"Shanaya"}})
+#
+# # 2. Print every message in the final history
+# print("\n--- FULL CONVERSATION HISTORY ---")
+# for message in final_state["messages"]:
+#     message.pretty_print()
 
 png_data = graph.get_graph().draw_mermaid_png()
 # Save it to a file in your project folder
